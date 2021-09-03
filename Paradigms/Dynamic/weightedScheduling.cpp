@@ -30,30 +30,18 @@ class Task{
         }      
 }; 
 
-class TaskCombination{
-    public: 
-        int maxProfit; 
-        vector<int> indexes; 
-
-        TaskCombination(){
-            maxProfit = 0;
-        };
-        void push_back(Task t){
-            maxProfit += t.weight;
-            indexes.push_back(t.index);
-        }
-        friend ostream& operator<<(ostream& os, const TaskCombination& t){
-            os << "Max Profit: " << t.maxProfit << "\t Indexes: ";
-            for (int i = 0; i < t.indexes.size(); i++) os << t.indexes[i] << " ";
-            return os;
-        }
+struct TaskW {
+    vector<Task> task; //keep track of tasks used to generate value
+    int value; //total profit value 
 };
 
+//No overlap
 bool areCompatible(Task t1, Task t2){
     // If they dont overlap
     return t1.start >= t2.end || t2.start >= t1.end;
 }
 
+//SORTING
 // Merge
 void merge(Task tasks[], int const left, int const mid, int const right)
 {
@@ -129,70 +117,41 @@ int binarySearch(Task tasks[], int currentIndex){
     return -1;
 }
 
-Task selectMaxWeight(Task t1, Task t2){
-    if(t1.weight > t2.weight) return t1;
-    return t2;
-}
-
-// Fin
+// Find tasks that give max profit value
 vector<int> findCompatible(Task allTasks[], int N){
-    // Indices will be stored here
+    
     vector<int> results;
+    
     //Sort by end time with mergeSort 
     mergeSort(allTasks, 0, N-1);
 
-    for(int i = 0; i < N; i++){
-        cout << i << ": " << allTasks[i].index << endl; 
+    //Keep track of tasks
+    TaskW OPT[N]; 
+    //initialize
+    OPT[0].value = allTasks[0].weight; 
+    OPT[0].task.push_back(allTasks[0]); 
+
+    for (int i = 1; i < N; i++) {
+        int profit = allTasks[i].weight;
+        int l = binarySearch(allTasks, i);
+        if (l != - 1)
+            profit += OPT[l].value;
+        if (profit > OPT[i - 1].value){
+            OPT[i].value = profit;
+            OPT[i].task = OPT[l].task;
+            OPT[i].task.push_back(allTasks[i]);
+        }
+        else
+            OPT[i] = OPT[i - 1];
     }
 
-    pair<int, vector<int>> *OPT = new  pair<int, vector<int>>[N]; 
-    OPT[0].first = allTasks[0].weight; 
-
-
-    vector<int> indexes; 
-    for (int i=1; i<N; i++){
-        int currWeight = allTasks[i].weight; //weight of task
-        int indexsum =  allTasks[i].index; 
-        int lastCompatibleTaskIndex = binarySearch(allTasks, i); //lastCompatibleTaskIndex is index 2
-        vector<int> currentIndexes = { lastCompatibleTaskIndex };
-        
-        // TODO: cambiar
-        if (lastCompatibleTaskIndex != -1){ // if theres compatible task 
-            // Sumar el weight
-            currWeight += OPT[lastCompatibleTaskIndex].first; //weight of task + weight of task 2
-            //indexsum += OPT[lastCompatibleTaskIndex].second; 
-            // Agregar los indices que tiene el task compatible
-            for(int j = 0; j<OPT[lastCompatibleTaskIndex].second.size(); j++){
-                currentIndexes.push_back(OPT[lastCompatibleTaskIndex].second[j]);
-            }
-            //currentIndexes = OPT[lastCompatibleTaskIndex].second;
-            // currentIndexes.push_back(lastCompatibleTaskIndex);
-            for(int j = 0; j<currentIndexes.size(); j++){
-                cout<<allTasks[currentIndexes[j]]<<", ";
-            }
-            cout << allTasks[i];
-            cout << " Weight: " << currWeight << endl; 
-        
-            //cout<<allTasks[i]<<", "<<allTasks[lastCompatibleTaskIndex]<<", "<<currWeight<<endl;
-
-        }
-        //================================
-        if(currWeight > OPT[i-1].first){
-            OPT[i].first = currWeight;
-            OPT[i].second.push_back(allTasks[i].index);  
-            //OPT[i].second.push_back(currentIndexes[0]); 
-            //OPT[i].second.push_back(allTasks[lastCompatibleTaskIndex].index);
-        }
-        else{
-            OPT[i].first = OPT[i-1].first;              
-        }
+    for (int i=0; i<OPT[N-1].task.size(); i++) {
+        Task t = OPT[N-1].task[i];
+        results.push_back(t.index); //original indexes
     }
-  
-    results = OPT[N-1].second;
-    cout << "Profit: " <<OPT[N-1].first << endl; 
-    delete[] OPT;
 
-    //sort(results.begin(), results.end());
+    //sort the original indexes 
+    sort(results.begin(), results.end());
     return results;
 }
 
@@ -231,9 +190,6 @@ int main(int argc, char** argv){
     for(int i = 0; i<N; i++){
         Task selected(i, startValues[i], endValues[i], weightValues[i]);
         allTasks[i] = selected;
-        // Print tasks
-        // TODO: remove
-        cout<<selected<<endl<<"====================="<<endl;
     }
 
     // Resultados
@@ -241,6 +197,6 @@ int main(int argc, char** argv){
     for(int i = 0; i < resultados.size(); i++){
         cout << resultados[i] << " ";  
     }  
-    //imprimir result printArray(allTasks, N);
+
     return 0;
 }
