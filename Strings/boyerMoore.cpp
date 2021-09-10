@@ -28,27 +28,26 @@ vector<int> search( string text, string pattern){
 
 	int shift = 0; 
 
-	while(shift <= (n - m)) { 
-		int j = m - 1; 
+    while(shift <= (n - m)) { 
+    int j = m - 1; 
 
-		while(j >= 0 && pattern[j] == text[shift + j]){
-		    j--; //pattern and text match
+        while(j >= 0 && pattern[j] == text[shift + j]){
+            j--; //pattern and text match
         } 
 
-		if (j < 0) { 
-            
+        if (j < 0) { 
+
             results.push_back(shift);
             
             if(shift + m < n){
                 shift += m - badchar[text[shift + m]];
             }
-            
             else{
-                 shift += 1; 
+                shift += 1;
             }
-		} 
+        } 
 
-		else{
+		else {
             shift += max(1, j - badchar[text[shift + j]]);
         }
 			
