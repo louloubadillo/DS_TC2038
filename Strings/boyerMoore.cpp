@@ -50,8 +50,8 @@ vector<int> search( string text, string pattern){
         else {
             shift += max(1, j - badchar[text[shift + j]]);
         }
-			
-	} 
+        
+    } 
 
     return results; 
 } 
