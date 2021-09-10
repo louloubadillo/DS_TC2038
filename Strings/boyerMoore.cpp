@@ -32,14 +32,17 @@ vector<int> search( string text, string pattern){
 		int j = m - 1; 
 
 		while(j >= 0 && pattern[j] == text[shift + j]){
-			j--; 
+		    j--; //pattern and text match
         } 
 
 		if (j < 0) { 
+            
             results.push_back(shift);
+            
             if(shift + m < n){
                 shift += m - badchar[text[shift + m]];
             }
+            
             else{
                  shift += 1; 
             }
