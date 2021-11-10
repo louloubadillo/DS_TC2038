@@ -2,6 +2,8 @@
  * @author Lourdes Badillo Granillo, Eduardo Villalpando Mello
  * @date 2021-11-03
  * Give an algorithm that computes the convex hull of any given set of n points in the plane efficiently 
+ * 
+ * //Checking some tests
 */
 
 #include <bits/stdc++.h>
