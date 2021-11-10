@@ -22,3 +22,4 @@ The idea is to simply store the results of subproblems, so that we do not have t
 ### Memoization
 -  Top Down Dynamic Programming
 
+<img src=https://media.geeksforgeeks.org/wp-content/cdn-uploads/Tabulation-vs-Memoization-1.png>
